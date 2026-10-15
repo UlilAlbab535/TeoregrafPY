@@ -1,0 +1,33 @@
+DAFTAR ISI ALGORITMA
+====================
+
+Nomor baris menunjukkan baris awal fungsi atau baris pemanggilan pada versi
+berkas saat daftar ini dibuat. Lokasi implementasi utama berada di graph_model.py.
+
+1. Dijkstra - mencari rute dengan total bobot minimum
+   Implementasi : graph_model.py, baris 68 (fungsi dijkstra)
+   Pemanggilan  : app.py, baris 477
+
+2. Validasi rute manual dan perhitungan bobot
+   Implementasi : graph_model.py, baris 105 (fungsi manual_path)
+   Pemanggilan  : app.py, baris 511
+
+3. Lintasan Euler - algoritma Hierholzer
+   Implementasi : graph_model.py, baris 126 (fungsi euler_trail)
+   Pemanggilan  : app.py, baris 493
+   Pemeriksaan keterhubungan pendukung menggunakan BFS:
+                 graph_model.py, baris 323 (fungsi _ensure_connected)
+
+4. Lintasan Hamilton - pencarian mundur (backtracking)
+   Implementasi : graph_model.py, baris 193 (fungsi hamilton_path)
+   Fungsi pencarian rekursif berada di dalam fungsi tersebut, baris 205.
+   Pemanggilan  : app.py, baris 496
+
+5. Pewarnaan simpul greedy
+   Implementasi : graph_model.py, baris 246 (fungsi greedy_coloring)
+   Pemanggilan  : app.py, baris 581 dan 636
+
+6. Bilangan kromatik minimum - pencarian/backtracking jumlah warna
+   Implementasi : graph_model.py, baris 266 (fungsi chromatic_number)
+   Fungsi uji rekursif berada di dalam fungsi tersebut, baris 275.
+   Pemanggilan  : app.py, baris 582

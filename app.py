@@ -1,37 +1,42 @@
 """Tkinter and Matplotlib interface for learning and exploring graph theory."""
 
+# Menunda evaluasi anotasi tipe agar anotasi dapat merujuk tipe tanpa evaluasi langsung.
 from __future__ import annotations
 
-import math
-import tkinter as tk
-from tkinter import messagebox, ttk
+# Pustaka standar: fungsi trigonometri untuk posisi simpul dan komponen antarmuka Tk.
+import math  # Menghitung posisi simpul pada lingkaran.
+import tkinter as tk  # Membuat jendela, kanvas, dan variabel antarmuka.
+from tkinter import messagebox, ttk  # Dialog pesan dan widget bertema Tk.
 
+# Pilih backend Tk sebelum pyplot diimpor agar Matplotlib dapat tampil di jendela Tk.
 import matplotlib
 
 matplotlib.use("TkAgg")
 
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
+# Komponen Matplotlib untuk palet, kanvas Tk, dan objek figur visualisasi.
+import matplotlib.pyplot as plt  # Mengakses palet warna untuk simpul.
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Menanam graf di Tk.
+from matplotlib.figure import Figure  # Menyediakan figur yang berisi sumbu graf.
 
+# Algoritma dan formatter dari model graf; antarmuka hanya mengelola masukan/tampilan.
 from graph_model import (
-    adjacency_list_text,
-    adjacency_matrix,
-    build_adjacency,
-    chromatic_number,
-    dijkstra,
-    euler_trail,
-    format_weight,
-    greedy_coloring,
-    hamilton_path,
-    manual_path,
-    route_weight,
+    adjacency_list_text,  # Mengubah graf menjadi teks daftar ketetanggaan.
+    adjacency_matrix,  # Membentuk matriks bobot antarsimpul.
+    build_adjacency,  # Membentuk struktur graf dari simpul dan sisi aplikasi.
+    chromatic_number,  # Menghitung bilangan kromatik graf secara eksak.
+    dijkstra,  # Mencari rute berbobot minimum dari simpul awal ke tujuan.
+    euler_trail,  # Mencari lintasan yang melewati setiap sisi tepat satu kali.
+    format_weight,  # Memformat bobot agar ringkas dan mudah dibaca.
+    greedy_coloring,  # Mewarnai simpul menggunakan algoritma greedy.
+    hamilton_path,  # Mencari lintasan yang mengunjungi simpul sesuai syarat Hamilton.
+    manual_path,  # Memvalidasi urutan simpul yang dimasukkan pengguna.
+    route_weight,  # Menjumlahkan bobot sisi sepanjang suatu rute.
 )
 
 
 class GraphTheoryApp:
     def __init__(self, root: tk.Tk) -> None:
-        """Siapkan status aplikasi, jendela utama, dan tampilan awal."""
+        """Inisialisasi status graf, variabel antarmuka, jendela, dan tampilan awal."""
         self.root = root
         self.root.title("Aplikasi Teori Graf")
         # Sesuaikan ukuran awal jendela dengan layar tanpa melampaui batas UI.
@@ -63,7 +68,7 @@ class GraphTheoryApp:
         self._refresh_graph()
 
     def _build_interface(self) -> None:
-        """Susun panel kontrol yang dapat digulir dan panel hasil graf."""
+        """Susun tata letak utama: kontrol yang dapat digulir dan panel hasil graf."""
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
         # Panel kiri berisi kontrol; panel kanan menampilkan graf dan representasi.
@@ -114,7 +119,7 @@ class GraphTheoryApp:
         self._build_text_display(display)
 
     def _build_vertex_controls(self, parent: ttk.Frame) -> None:
-        """Buat kontrol jumlah simpul dan penyuntingan nama simpul."""
+        """Buat formulir untuk menentukan jumlah simpul dan mengubah nama-namanya."""
         section = ttk.LabelFrame(parent, text="1. Simpul", padding=8)
         section.grid(row=0, column=0, sticky="ew", pady=(0, 8))
         section.columnconfigure(1, weight=1)
@@ -151,7 +156,7 @@ class GraphTheoryApp:
         ).grid(row=2, column=0, columnspan=3, sticky="ew")
 
     def _build_edge_controls(self, parent: ttk.Frame) -> None:
-        """Buat formulir penambahan, penghapusan, dan daftar sisi berbobot."""
+        """Buat kontrol pemilihan ujung sisi, bobot, satuan, serta daftar sisi."""
         section = ttk.LabelFrame(parent, text="2. Sisi dan bobot", padding=8)
         section.grid(row=1, column=0, sticky="ew", pady=(0, 8))
         section.columnconfigure(1, weight=1)
@@ -187,7 +192,7 @@ class GraphTheoryApp:
         ).grid(row=6, column=0, columnspan=2, sticky="ew")
 
     def _build_route_controls(self, parent: ttk.Frame) -> None:
-        """Buat pilihan algoritma rute, pewarnaan, dan navigasi langkah."""
+        """Buat pilihan palet dan algoritma rute beserta kontrol navigasi langkah."""
         section = ttk.LabelFrame(parent, text="3. Rute dan pewarnaan", padding=8)
         section.grid(row=2, column=0, sticky="ew", pady=(0, 8))
         section.columnconfigure(0, weight=1)
@@ -291,7 +296,7 @@ class GraphTheoryApp:
         self.route_output.grid(row=6, column=0, sticky="ew", pady=(5, 0))
 
     def _build_graph_display(self, parent: ttk.Frame) -> None:
-        """Siapkan area Matplotlib yang digunakan untuk menggambar graf."""
+        """Siapkan dan pasang kanvas Matplotlib untuk visualisasi graf."""
         graph_frame = ttk.LabelFrame(parent, text="Visualisasi graf", padding=4)
         graph_frame.grid(row=0, column=0, sticky="nsew", pady=(0, 8))
         graph_frame.rowconfigure(0, weight=1)
@@ -302,7 +307,7 @@ class GraphTheoryApp:
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
 
     def _build_text_display(self, parent: ttk.Frame) -> None:
-        """Siapkan panel teks dengan scrollbar untuk daftar dan matriks ketetanggaan."""
+        """Siapkan panel teks bergulir untuk representasi daftar dan matriks ketetanggaan."""
         representation = ttk.LabelFrame(
             parent, text="Adjacency List dan Adjacency Matrix", padding=4
         )
@@ -328,7 +333,7 @@ class GraphTheoryApp:
         horizontal.grid(row=1, column=0, sticky="ew")
 
     def _prepare_vertex_names(self) -> None:
-        """Validasi jumlah simpul lalu buat kolom nama dengan nama bawaan."""
+        """Validasi jumlah simpul dan buat kolom nama dengan nilai awal yang sesuai."""
         try:
             count = int(self.vertex_count_var.get())
             if not 1 <= count <= 100:
@@ -357,7 +362,7 @@ class GraphTheoryApp:
         )
 
     def _apply_vertices(self) -> None:
-        """Validasi nama simpul dan terapkan perubahan ke model graf."""
+        """Validasi keunikan nama, ganti simpul graf, lalu segarkan pilihan dan tampilan."""
         if not self.name_entries:
             self._prepare_vertex_names()
             if not self.name_entries:
@@ -381,7 +386,7 @@ class GraphTheoryApp:
         self._refresh_graph()
 
     def _update_vertex_choices(self) -> None:
-        """Sinkronkan pilihan simpul pada seluruh combobox."""
+        """Perbarui pilihan semua combobox dan atur nilai awal berdasarkan simpul aktif."""
         for combo in (
             self.edge_from,
             self.edge_to,
@@ -409,7 +414,7 @@ class GraphTheoryApp:
             self.mapping_target_var.set("")
 
     def _add_edge(self) -> None:
-        """Validasi masukan sisi dan bobot sebelum memperbarui graf."""
+        """Validasi ujung serta bobot sisi, simpan sisi baru, dan segarkan tampilan graf."""
         left = self.edge_from.get()
         right = self.edge_to.get()
         if not left or not right:
@@ -439,7 +444,7 @@ class GraphTheoryApp:
         self._refresh_graph()
 
     def _remove_edge(self) -> None:
-        """Hapus sisi yang dipilih lalu perbarui seluruh tampilan terkait."""
+        """Hapus sisi terpilih, batalkan rute lama, dan perbarui representasi graf."""
         selection = self.edge_list.curselection()
         if not selection:
             return
@@ -449,7 +454,7 @@ class GraphTheoryApp:
         self._refresh_graph()
 
     def _update_edge_list(self) -> None:
-        """Gambar ulang daftar sisi beserta bobot dan satuan aktif."""
+        """Tampilkan ulang semua sisi dengan bobot yang diformat dalam satuan aktif."""
         self.edge_list.delete(0, tk.END)
         for left, right, weight in self.edges:
             self.edge_list.insert(
@@ -457,13 +462,13 @@ class GraphTheoryApp:
             )
 
     def _on_unit_changed(self, _event: object | None = None) -> None:
-        """Segarkan teks dan graf ketika satuan bobot diubah."""
+        """Tangani perubahan satuan dengan memperbarui label bobot dan visualisasi."""
         self._clear_route()
         self._update_edge_list()
         self._refresh_graph()
 
     def _find_dijkstra_route(self) -> None:
-        """Hitung rute berbobot minimum dan tampilkan kesalahan kepada pengguna."""
+        """Cari rute terpendek berbobot dari pilihan pengguna dan tampilkan hasil atau galat."""
         if not self.vertices:
             messagebox.showerror("Graf kosong", "Tambahkan simpul terlebih dahulu.")
             return
@@ -476,7 +481,7 @@ class GraphTheoryApp:
         self._set_route(route, total, "Rute terpendek (Dijkstra)")
 
     def _find_mapping_route(self) -> None:
-        """Jalankan algoritma Euler atau Hamilton sesuai pilihan pengguna."""
+        """Cari lintasan Euler atau Hamilton sesuai pilihan, lalu hitung bobot lintasannya."""
         if not self.vertices:
             messagebox.showerror("Graf kosong", "Tambahkan simpul terlebih dahulu.")
             return
@@ -497,7 +502,7 @@ class GraphTheoryApp:
         self._set_route(route, total, description)
 
     def _find_manual_route(self) -> None:
-        """Validasi rute yang dimasukkan pengguna dan tampilkan total bobotnya."""
+        """Validasi urutan simpul manual, hitung bobotnya, dan tampilkan jika sah."""
         if not self.vertices:
             messagebox.showerror("Graf kosong", "Tambahkan simpul terlebih dahulu.")
             return
@@ -510,7 +515,7 @@ class GraphTheoryApp:
         self._set_route(route, total, "Rute manual")
 
     def _set_route(self, route: list[str], total: float, description: str) -> None:
-        """Simpan hasil rute dan mulai tampilan dari langkah pertama."""
+        """Simpan hasil rute beserta keterangannya dan tampilkan dari langkah pertama."""
         self.route = route
         self.route_total = total
         self.route_description = description
@@ -518,7 +523,7 @@ class GraphTheoryApp:
         self._update_route_step()
 
     def _clear_route(self) -> None:
-        """Hapus status dan teks rute agar hasil lama tidak tampil pada graf baru."""
+        """Reset status rute dan teksnya ketika struktur graf atau satuan berubah."""
         self.route = None
         self.route_total = 0
         self.route_description = ""
@@ -528,19 +533,19 @@ class GraphTheoryApp:
             self._set_text(self.route_output, "")
 
     def _previous_route_step(self) -> None:
-        """Mundur satu langkah tanpa melewati awal rute."""
+        """Mundurkan sorotan rute satu langkah, dengan batas di simpul pertama."""
         if self.route is not None:
             self.route_step = max(0, self.route_step - 1)
             self._update_route_step()
 
     def _next_route_step(self) -> None:
-        """Maju satu langkah tanpa melewati simpul terakhir rute."""
+        """Majukan sorotan rute satu langkah, dengan batas di simpul terakhir."""
         if self.route is not None:
             self.route_step = min(len(self.route) - 1, self.route_step + 1)
             self._update_route_step()
 
     def _update_route_step(self) -> None:
-        """Perbarui progres, total akumulasi, teks, dan sorotan graf."""
+        """Hitung progres rute, perbarui teks status, lalu gambar ulang sorotannya."""
         if self.route is None:
             return
         graph = build_adjacency(self.vertices, self.edges)
@@ -569,7 +574,7 @@ class GraphTheoryApp:
         self._draw_graph()
 
     def _refresh_graph(self) -> None:
-        """Hitung ulang informasi pewarnaan dan segarkan semua representasi graf."""
+        """Hitung informasi warna graf dan perbarui teks serta visualisasinya."""
         graph = build_adjacency(self.vertices, self.edges)
         if self.vertices:
             # Tampilkan hasil pewarnaan eksak dan jumlah warna pendekatan greedy.
@@ -586,7 +591,7 @@ class GraphTheoryApp:
         self._draw_graph()
 
     def _update_representation(self, graph: dict[str, list[tuple[str, float]]]) -> None:
-        """Format daftar dan matriks ketetanggaan ke dalam panel teks."""
+        """Format daftar ketetanggaan dan matriks bobot ke panel representasi teks."""
         lines = [
             "ADJACENCY LIST",
             adjacency_list_text(graph, self.unit_var.get()) or "(belum ada simpul)",
@@ -615,7 +620,7 @@ class GraphTheoryApp:
         self._set_text(self.representation_output, "\n".join(lines))
 
     def _draw_graph(self) -> None:
-        """Gambar simpul, sisi berbobot, warna, dan progres rute saat ini."""
+        """Gambar graf beserta bobot, warna simpul, dan kemajuan lintasan yang aktif."""
         self.axes.clear()
         self.axes.axis("off")
         if not self.vertices:
@@ -733,7 +738,7 @@ class GraphTheoryApp:
 
     @staticmethod
     def _set_text(widget: tk.Text, value: str) -> None:
-        """Ganti isi widget teks yang biasanya dikunci untuk mencegah penyuntingan."""
+        """Ganti isi widget teks terkunci lalu kunci kembali agar hanya-baca."""
         widget.configure(state="normal")
         widget.delete("1.0", tk.END)
         widget.insert("1.0", value)
@@ -741,7 +746,7 @@ class GraphTheoryApp:
 
 
 def main() -> None:
-    """Buat jendela Tkinter dan mulai event loop aplikasi."""
+    """Buat aplikasi utama dan jalankan event loop Tkinter sampai jendela ditutup."""
     root = tk.Tk()
     GraphTheoryApp(root)
     root.mainloop()
